@@ -23,18 +23,19 @@ For a comprehensive details of NVIDIA NIMs, refer to the [NVIDIA Developer Cente
 3. [Create a DOKS cluster](https://docs.digitalocean.com/products/kubernetes/reference/gpu-worker-nodes/) with H100 GPU(s):
    - For Llama 2 8B model: 1x H100 GPU is sufficient
    - For Llama 2 70B model: 4x H100 GPUs are recommended
+   
    Consult the [NVIDIA NIM support matrix](https://docs.nvidia.com/nim/large-language-models/latest/support-matrix.html) for specific GPU capacity requirements.
 
 4. This tutorial covers both 8B and 70B models. Note that running the 70B model across multiple nodes requires an additional step and has extra requirements (e.g., faster inter-GPU communication).
 
 5. Create a DigitalOcean droplet in the same VPC as your DOKS cluster to host a Samba server. We will utilize the SMB CSI provisioner on DOKS to create a ReadWriteMany storage class. This shared storage is used by NIMs to store the downloaded models.
 
-6. Clone this repo locally where you have setup your kubeconfig for DOKS cluster. It is assumed that you have kubectl and helm 3 installed locally.
+6. Clone this repo locally where you have setup your kubeconfig for DOKS cluster. It is assumed that you have kubectl and helm installed locally.
 
 
 ## Verify GPU Cards
 
-This optional step allows you to easily check the status of NVIDIA GPUs in your cluster. While `nvidia-smi` is the primary command for NVIDIA GPUs, it needs to be run within a container on the node.. By deploying a DaemonSet on GPU nodes, you can quickly access `nvidia-smi` when needed.
+This optional step allows you to easily check the status of NVIDIA GPUs in your cluster. While `nvidia-smi` is the primary command for NVIDIA GPUs, it needs to be run within a container on the node. By deploying a DaemonSet on GPU nodes, you can quickly access `nvidia-smi` when needed.
 
 > Note: The following file is located in the `1-verify-gpu-cards` directory.
 
@@ -162,7 +163,7 @@ We use a DigitalOcean droplet created in the same VPC for setting up a Samba ser
 
 Run the commands in the file `samba-server-on-droplet.sh`. 
 
-At minimum, you will have to modify the volume to be shared. You may want to customize the username/password.
+At minimum, you will have to modify the volume path that is to be shared. You may want to customize the username/password.
 
 ### Setup SMB CSI Provisioner on DOKS
 
@@ -356,5 +357,5 @@ We used the same performance commands as 8B model, but with concurrent connectio
 - Output token throughput (per sec): 39.35
 - Request throughput (per sec): 0.67
 
-> Note: The 70B model puts significant pressure on the infrastructure and should ideally run on a single 8x H100 node or multiple nodes connected via accelerated networking.
+> Note: The 70B model puts significant pressure on the infrastructure (check grafana dashboards for GPU and network stats) and should ideally run on a single 8x H100 node or multiple nodes connected via accelerated networking.
 
