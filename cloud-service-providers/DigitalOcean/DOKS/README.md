@@ -12,7 +12,8 @@ For a comprehensive details of NVIDIA NIMs, refer to the [NVIDIA Developer Cente
 - [SMB Storage Setup](#smb-storage-setup)
 - [Deploy and Test NIM](#deploy-and-test-nim)
   - [Llama3 8B](#llama3-8b)
-  - [Llama3 70B](#llama3-70b)
+  - [Llama3 70B on a sigle node](#deploying-llama31-70b-on-a-single-node)
+  - [Llama3 70B on multiple nodes](#deploying-llama3-70b-on-multiple-nodes)
 
 ## Prerequisites
 
@@ -216,11 +217,12 @@ We are primarily interested in sequential r/w, as the shared storage will be use
 > Note: For a basic 1CPU/2GB droplet with 250GB DO volume, we get around ~218MB/s of sequential read/write performance. This is good enough for our use case (storing model files).
 
 
+
 ## Deploy and Test NIM
 
-The files referenced in this section are in the `5-deploy-llama3-nim` and `6-deploy-llama3-70b` directories.
+The files referenced in this section are located in the `5-deploy-llama3-nim` and `6-deploy-llama3-70b` directories.
 
-### Common Tasks
+### Common Setup
 
 1. Set up your NGC API key:
    ```bash
@@ -239,24 +241,24 @@ The files referenced in this section are in the `5-deploy-llama3-nim` and `6-dep
    kubectl -n nim create secret generic ngc-api --from-literal=NGC_API_KEY=$NGC_API_KEY
    ```
 
-### Llama3 8B
+### Deploying Llama3.1 8B
 
-1. Review the Helm values file for your deployment option. The helm package in the instll command below is in helm/nim-llm folder of the repository. You will need to adjust the path accordingly for the command to work.
+1. Review the Helm values file for your deployment option. The Helm package is in the `helm/nim-llm` folder of the repository. You will need to adjust the path accordingly for the command to work. Alternately, you can also download the helm chart from [NVCR](https://catalog.ngc.nvidia.com/orgs/nim/helm-charts/nim-llm) and point to that.
 
-2. Deploy using SMB share as the model store.
+2. Deploy using either SMB share or host path as the model store:
    ```bash
+   # Using SMB share
    helm --namespace nim install my-nim nim-llm/ -f ./custom-values-SMB.yaml
-   ```
-   Or, deploy using host path as the model store:
-   ```bash
+   
+   # Using host path
    helm --namespace nim install my-nim nim-llm/ -f ./custom-values-hostpath.yaml
    ```
 
-3. Verify the model pod is up in the `nim` namespace.
+3. Verify the model pod is running in the `nim` namespace.
 
 4. Check that the model is being downloaded in the SMB shared folder, e.g.:
    ```
-   <smb_share>/<pvc>/ngc/hub/models--nim--meta--llama-3_1-70b-instruct/blobs/
+   <smb_share>/<pvc>/ngc/hub/models--nim--meta--llama-2-70b-instruct/blobs/
    ```
 
 5. Run Helm test to verify functionality:
@@ -288,7 +290,7 @@ The files referenced in this section are in the `5-deploy-llama3-nim` and `6-dep
          "role": "user"
        }
      ],
-     "model": "meta/llama-3.1-8b-instruct",
+     "model": "meta/llama-2-8b-instruct",
      "max_tokens": 16,
      "top_p": 1,
      "n": 1,
@@ -321,10 +323,26 @@ The files referenced in this section are in the `5-deploy-llama3-nim` and `6-dep
 - Output token throughput (per sec): 5543.97
 - Request throughput (per sec): 51.46
 
+### Deploying Llama3.1 70B on a Single Node
 
-### Deploying Llama3 70B
+This deployment requires 4x H100 GPUs. The steps are the same as for Llama3 8B.
 
-Llama3 70B model requires 4x H100 GPUs to run in production. In this example, we deliberately picked 4 individual nodes with 1x H100 each for illustration.
+#### Benchmark Results for Llama 2 70B on 4x H100 GPUs (Single Node)
+
+| Statistic                  | avg       | min     | max       | p99      | p90      | p75      |
+|----------------------------|-----------|---------|-----------|----------|----------|----------|
+| Time to first token (ms)   | 113.56    | 38.19   | 486.29    | 483.58   | 317.77   | 115.30   |
+| Inter token latency (ms)   | 20.07     | 15.36   | 30.21     | 22.46    | 21.44    | 20.91    |
+| Request latency (ms)       | 2,315.78  | 318.68  | 2,607.27  | 2,602.71 | 2,487.88 | 2,466.75 |
+| Output sequence length     | 110.88    | 14.00   | 131.00    | 128.00   | 123.00   | 120.00   |
+| Input sequence length      | 106.32    | 3.00    | 196.00    | 194.00   | 164.00   | 145.00   |
+
+- Output token throughput (per sec): 2309.62
+- Request throughput (per sec): 20.83
+
+### Deploying Llama3.1 70B on Multiple Nodes
+
+This example uses 4 individual nodes with 1x H100 each for illustration purposes.
 
 #### Prerequisites
 
@@ -336,15 +354,13 @@ Llama3 70B model requires 4x H100 GPUs to run in production. In this example, we
 
 #### Deployment
 
-Deploy Llama3 70B across 4x H100 nodes. Note that helm package nim-llm is in helm folder of the repository, so you will need to adjust the paths.
+Deploy Llama3.1 70B across 4x H100 nodes. Note that helm package nim-llm is in helm folder of the repository, so you will need to adjust the paths. Alternately, you can also download the helm chart from [NVCR](https://catalog.ngc.nvidia.com/orgs/nim/helm-charts/nim-llm) and point to that.
 
 ```bash
 helm --namespace nim install my-nim nim-llm/ -f 6-deploy-llama3-70b/custom-values-SMB.yaml
 ```
 
-#### Performance Testing
-
-We used the same performance commands as 8B model, but with concurrent connections set to 10.
+#### Performance Testing Results (10 concurrent connections)
 
 | Statistic                  | avg       | min      | max       | p99       | p90       | p75       |
 |----------------------------|-----------|----------|-----------|-----------|-----------|-----------|
@@ -357,5 +373,9 @@ We used the same performance commands as 8B model, but with concurrent connectio
 - Output token throughput (per sec): 39.35
 - Request throughput (per sec): 0.67
 
-> Note: The 70B model puts significant pressure on the infrastructure (check grafana dashboards for GPU and network stats) and should ideally run on a single 8x H100 node or multiple nodes connected via accelerated networking.
+> Note: The 70B model with multiple nodes puts significant pressure on the infrastructure. Single-node (multiple GPUs) performance is much higher. For optimal performance, it's recommended to run on a single 8x H100 node or multiple nodes connected via accelerated networking.
+
+
+
+
 

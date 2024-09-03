@@ -1,5 +1,7 @@
 # Execute inside triton pod
-export NIM_MODEL_NAME="meta/llama-3.1-8b-instruct"
+# export NIM_MODEL_NAME="meta/llama-3.1-8b-instruct"
+export NIM_MODEL_NAME="meta/llama-3.1-70b-instruct"
+
 export SERVER_URL=http://my-nim-nim-llm.nim.svc.cluster.local:8000
 export NUM_PROMPTS=100
 export INPUT_TOKENS=100
