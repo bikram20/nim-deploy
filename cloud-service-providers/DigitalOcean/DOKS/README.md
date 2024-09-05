@@ -290,7 +290,7 @@ The files referenced in this section are located in the `5-deploy-llama3-nim` an
       "role": "user"
     }
   ],
-  "model": "meta/llama3-8b-instruct",
+  "model": "meta/llama3.1-8b-instruct",
   "max_tokens": 4096,
   "top_p": 1,
   "n": 1,
