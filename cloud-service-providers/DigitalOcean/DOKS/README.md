@@ -11,9 +11,9 @@ For a comprehensive details of NVIDIA NIMs, refer to the [NVIDIA Developer Cente
 - [GPU Operator Setup](#gpu-operator-setup)
 - [SMB Storage Setup](#smb-storage-setup)
 - [Deploy and Test NIM](#deploy-and-test-nim)
-  - [Llama3 8B](#llama3-8b)
-  - [Llama3 70B on a sigle node](#deploying-llama31-70b-on-a-single-node)
-  - [Llama3 70B on multiple nodes](#deploying-llama3-70b-on-multiple-nodes)
+  - [Llama3.1 8B](#llama3-8b)
+  - [Llama3.1 70B on a sigle node](#deploying-llama31-70b-on-a-single-node)
+  - [Llama3.1 70B on multiple nodes](#deploying-llama3-70b-on-multiple-nodes)
 
 ## Prerequisites
 
@@ -258,7 +258,7 @@ The files referenced in this section are located in the `5-deploy-llama3-nim` an
 
 4. Check that the model is being downloaded in the SMB shared folder, e.g.:
    ```
-   <smb_share>/<pvc>/ngc/hub/models--nim--meta--llama-2-70b-instruct/blobs/
+   <smb_share>/<pvc>/ngc/hub/models--nim--meta--llama-3_1-70b-instruct/blobs/
    ```
 
 5. Run Helm test to verify functionality:
@@ -290,7 +290,7 @@ The files referenced in this section are located in the `5-deploy-llama3-nim` an
       "role": "user"
     }
   ],
-  "model": "meta/llama3.1-8b-instruct",
+  "model": "meta/llama-3.1-70b-instruct",
   "max_tokens": 4096,
   "top_p": 1,
   "n": 1,
