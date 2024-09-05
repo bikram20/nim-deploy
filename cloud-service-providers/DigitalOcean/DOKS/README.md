@@ -211,7 +211,7 @@ We are primarily interested in sequential r/w, as the shared storage will be use
 
 4. Clean up benchmark resources:
    ```bash
-   kubectl delete -f fio-benchmark.yaml
+   kubectl delete -f fio-test.yaml
    ```
 
 > Note: For a basic 1CPU/2GB droplet with 250GB DO volume, we get around ~218MB/s of sequential read/write performance. This is good enough for our use case (storing model files).
