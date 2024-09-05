@@ -19,3 +19,5 @@ statefulSet:
 resources:
   limits:
     nvidia.com/gpu: 4
+startupProbe:
+  failureThreshold: 1500
