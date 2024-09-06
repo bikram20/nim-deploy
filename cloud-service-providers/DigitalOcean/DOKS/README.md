@@ -1,6 +1,6 @@
 # NVIDIA NIMs on DOKS
 
-This document outlines the process of setting up NVIDIA Inference Microservices (NIMs) on DigitalOcean Kubernetes Service (DOKS). NVIDIA NIMs provide pre-optimized container images for both pretrained and customized foundation models, facilitating easy deployment across various architectures (single GPU, multiple GPUs, multi-node GPUs). These microservices are specifically optimized for latency and throughput.
+This document outlines the process of setting up NVIDIA Inference Microservices (NIMs) on [DigitalOcean Kubernetes Service (DOKS)](https://docs.digitalocean.com/products/kubernetes/reference/gpu-worker-nodes/). NVIDIA NIMs provide pre-optimized container images for both pretrained and customized foundation models, facilitating easy deployment across various architectures (single GPU, multiple GPUs, multi-node GPUs). These microservices are specifically optimized for latency and throughput.
 
 For a comprehensive details of NVIDIA NIMs, refer to the [NVIDIA Developer Center](https://developer.nvidia.com/nim).
 
@@ -19,11 +19,11 @@ For a comprehensive details of NVIDIA NIMs, refer to the [NVIDIA Developer Cente
 
 1. Obtain an [NVIDIA enterprise license](https://build.nvidia.com/explore/discover?signin=true). Verify the license locally by running `docker login nvcr.io`.
 
-2. Gain access to DOKS GPU Early Availability. Sign up through the DOKS cloud console. Note: This requirement will be deprecated in the near future.
+2. Gain access to DOKS GPU Early Availability. Sign up through the DigitalOcean cloud console via [Feature Preview](https://cloud.digitalocean.com/account/feature-preview). Note: This requirement will be deprecated in the near future.
 
 3. [Create a DOKS cluster](https://docs.digitalocean.com/products/kubernetes/reference/gpu-worker-nodes/) with H100 GPU(s):
-   - For Llama 2 8B model: 1x H100 GPU is sufficient
-   - For Llama 2 70B model: 4x H100 GPUs are recommended
+   - For Llama 3.1 8B model: 1x H100 GPU is sufficient
+   - For Llama 3.1 70B model: 4x H100 GPUs are recommended
    
    Consult the [NVIDIA NIM support matrix](https://docs.nvidia.com/nim/large-language-models/latest/support-matrix.html) for specific GPU capacity requirements.
 
